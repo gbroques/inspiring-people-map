@@ -63,10 +63,11 @@ function addAmtrakRoutes(map, amtrakRoutes) {
     const layerControl = L.control.layers(null, overlayMaps).addTo(map);
 }
 function addRowToMap(map, row) {
-    const {latitude, longitude, name, address, url} = row;
+    const {latitude, longitude, name, project, address, url} = row;
     const options = {title: name};
     const popup = [
         `<strong>${name}</strong>`,
+        project,
         address,
         url && `<a href="${url}" target="_blank">${url}</a>`
     ].filter(Boolean).join('<br />');
