@@ -25,17 +25,17 @@ function addAmtrakRoutes(map, amtrakRoutes) {
     // https://developers.arcgis.com/web-map-specification/objects/featureCollection/
     const featureSet = amtrakRoutes.layers[0].featureSet;
     let coordinatesList = featureSet.features.map(({attributes, geometry}) => ({name: attributes.name, coordinates: geometry.paths.map(path => (
-      path.map(feature => {
-          const [lon, lat] = feature;
-          return [lat, lon]; // Leaflet expects [lat, lon]
-      })))}));
+        path.map(feature => {
+            const [lon, lat] = feature;
+            return [lat, lon]; // Leaflet expects [lat, lon]
+        })))}));
 
     for (const {coordinates} of coordinatesList) {
-      L.polyline(coordinates, {
-          color: 'blue',
-          weight: 3,
-          opacity: 0.8
-      }).addTo(map);
+        L.polyline(coordinates, {
+            color: 'blue',
+            weight: 3,
+            opacity: 0.8
+        }).addTo(map);
     }
 }
 function initializeMap(id, options) {
