@@ -16,3 +16,11 @@ Export CSV from [Inspiring People Sheet](https://docs.google.com/spreadsheets/d/
 
 Download Feature Collection from the following website to [NTAD_Amtrak_Routes_1361372499291965491.txt](./NTAD_Amtrak_Routes_1361372499291965491.txt):
 https://data-usdot.opendata.arcgis.com/datasets/amtrak-routes/explore
+
+## Dependencies
+
+The following dependencies are used for custom map markers:
+
+1. [Font Awesome](https://fontawesome.com/) - for font icons stored in [webfonts/](./webfonts) and [vendor/fontawesome-7.1.0-all.min.css](./vendor/fontawesome-7.1.0-all.min.css).
+2. [Leaflet.awesome-markers plugin v2.0](https://github.com/lennardv2/Leaflet.awesome-markers) - for custom Leaflet marker icons stored in [vendor/](./vendor).
+

@@ -1,9 +1,10 @@
-import * as L from "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js";
+L.AwesomeMarkers.Icon.prototype.options.prefix = 'fa';
 
 const csvPromise = fetch('Inspiring People.csv')
     .then(r => r.text())
     .then(csvToArray)
-    .then(rows => rows.filter(row => row.latitude && row.longitude));
+    .then(rows => rows.filter(row => row.latitude && row.longitude))
+    .then(rows => rows.map(row => ({...row, marker: {icon: 'circle', markerColor: 'cadetblue'}})));
 const amtrakRoutesPromise = fetch('NTAD_Amtrak_Routes_1361372499291965491.txt')
     .then(r => r.json());
 csvPromise.then(rows => {
@@ -11,7 +12,11 @@ csvPromise.then(rows => {
         name: 'Home',
         address: 'St. Louis, Missouri',
         latitude: 38.63,
-        longitude: -90.20
+        longitude: -90.20,
+        marker: {
+            icon: 'home',
+            markerColor: 'red'
+        }
     };
     const map = L.map('map', {
         center: [home.latitude, home.longitude],
@@ -63,8 +68,11 @@ function addAmtrakRoutes(map, amtrakRoutes) {
     const layerControl = L.control.layers(null, overlayMaps).addTo(map);
 }
 function addRowToMap(map, row) {
-    const {latitude, longitude, name, project, address, url} = row;
-    const options = {title: name};
+    const {latitude, longitude, name, project, address, url, marker} = row;
+    const options = {
+        title: name,
+        icon: L.AwesomeMarkers.icon(marker)
+    };
     const popup = [
         `<strong>${name}</strong>`,
         project,
