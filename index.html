@@ -15,23 +15,44 @@
     <div id="map"></div>
 </body>
 <script>
-    fetch('Inspiring People.csv')
-        .then(r => r.text())
-        .then(csvToArray)
-        .then(rows => rows.filter(row => row.latitude && row.longitude))
-        .then(rows => {
-            const home = {
-                name: 'Home',
-                address: 'St. Louis, Missouri',
-                latitude: 38.63,
-                longitude: -90.20
-            };
-            const map = initializeMap('map', {
-                center: [home.latitude, home.longitude],
-                zoom: 3
-            });
-            [home, ...rows].forEach(row => addRowToMap(map, row));
+    const csvPromise = fetch('Inspiring People.csv')
+      .then(r => r.text())
+      .then(csvToArray)
+      .then(rows => rows.filter(row => row.latitude && row.longitude));
+    const amtrakRoutesPromise = fetch('NTAD_Amtrak_Routes_1361372499291965491.txt')
+      .then(r => r.json());
+    csvPromise.then(rows => {
+        const home = {
+            name: 'Home',
+            address: 'St. Louis, Missouri',
+            latitude: 38.63,
+            longitude: -90.20
+        };
+        const map = initializeMap('map', {
+            center: [home.latitude, home.longitude],
+            zoom: 3
         });
+        [home, ...rows].forEach(row => addRowToMap(map, row));
+        amtrakRoutesPromise.then(amtrakRoutes => addAmtrakRoutes(map, amtrakRoutes));
+    });
+    function addAmtrakRoutes(map, amtrakRoutes) {
+      // Feature Collection format
+      // https://developers.arcgis.com/web-map-specification/objects/featureCollection/
+      const featureSet = amtrakRoutes.layers[0].featureSet;
+      let coordinatesList = featureSet.features.map(({attributes, geometry}) => ({name: attributes.name, coordinates: geometry.paths.map(path => (
+          path.map(feature => {
+              const [lon, lat] = feature;
+              return [lat, lon]; // Leaflet expects [lat, lon]
+          })))}));
+
+      for (const {coordinates} of coordinatesList) {
+          L.polyline(coordinates, {
+              color: 'blue',
+              weight: 3,
+              opacity: 0.8
+          }).addTo(map);
+      }
+    }
     function initializeMap(id, options) {
         const map = L.map(id, options);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
