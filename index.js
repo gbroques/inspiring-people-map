@@ -39,14 +39,26 @@ function addAmtrakRoutes(map, amtrakRoutes) {
             })))
     }));
 
-    const polylines = coordinatesList.map(({coordinates}) => (
-        L.polyline(coordinates, {
-            color: 'blue',
-            weight: 3,
-            opacity: 0.8
-        })
+    const routeStyle = {
+        color: 'blue',
+        weight: 3,
+        opacity: 0.8
+    };
+    const routeHoverStyle = {
+        weight: 5,
+        opacity: 1.0
+    };
+    const polylines = coordinatesList.map(({name, coordinates}) => (
+        L.polyline(coordinates, routeStyle)
+            .bindTooltip(name, {sticky: true})
+            .on('mouseover', function() {
+                this.setStyle(routeHoverStyle);
+            })
+            .on('mouseout', function() {
+                this.setStyle(routeStyle);
+            })
     ));
-    const amtrakRoutesGroup = L.layerGroup(polylines);
+    const amtrakRoutesGroup = L.layerGroup(polylines).addTo(map);
     const overlayMaps = {'Amtrak Routes': amtrakRoutesGroup};
     const layerControl = L.control.layers(null, overlayMaps).addTo(map);
 }
