@@ -13,9 +13,15 @@ csvPromise.then(rows => {
         latitude: 38.63,
         longitude: -90.20
     };
-    const map = initializeMap('map', {
+    const map = L.map('map', {
         center: [home.latitude, home.longitude],
-        zoom: 3
+        zoom: 3,
+        layers: [
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            })
+        ]
     });
     [home, ...rows].forEach(row => addRowToMap(map, row));
     amtrakRoutesPromise.then(amtrakRoutes => addAmtrakRoutes(map, amtrakRoutes));
@@ -33,21 +39,16 @@ function addAmtrakRoutes(map, amtrakRoutes) {
             })))
     }));
 
-    for (const {coordinates} of coordinatesList) {
+    const polylines = coordinatesList.map(({coordinates}) => (
         L.polyline(coordinates, {
             color: 'blue',
             weight: 3,
             opacity: 0.8
-        }).addTo(map);
-    }
-}
-function initializeMap(id, options) {
-    const map = L.map(id, options);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-    return map;
+        })
+    ));
+    const amtrakRoutesGroup = L.layerGroup(polylines);
+    const overlayMaps = {'Amtrak Routes': amtrakRoutesGroup};
+    const layerControl = L.control.layers(null, overlayMaps).addTo(map);
 }
 function addRowToMap(map, row) {
     const {latitude, longitude, name, address, url} = row;
